@@ -11,13 +11,17 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\Persistence\ObjectManager;
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+
 
 
 class TestFixtures extends Fixture
 {
-    public function __construct(ManagerRegistry $doctrine)
+    public function __construct(ManagerRegistry $doctrine, UserPasswordHasherInterface $hasher)
     {
         $this->doctrine = $doctrine;
+        $this->hasher = $hasher;
+
     }
 
     public function load(ObjectManager $manager): void
@@ -26,7 +30,7 @@ class TestFixtures extends Fixture
 
         $this->loadAuteurs($manager, $faker);
         $this->loadUsers($manager, $faker);
-        // $this->loadLivres($manager, $faker);
+        $this->loadLivres($manager, $faker);
         
     }
     
@@ -127,7 +131,8 @@ class TestFixtures extends Fixture
             $user = new User();
             $user->setEmail($faker->email);
             $user->setRoles(['ROLE_EMPRUNTEUR']);
-            $user->setPassword($faker->password);
+            $password = $this->hasher->hashPassword($user, '123');
+            $user->setPassword($password);
             $user->setEnabled(true);
             $date = $faker->dateTimeThisYear();
             $date = DateTimeImmutable::createFromInterface($date);
@@ -142,39 +147,88 @@ class TestFixtures extends Fixture
     }
 
 
-    // public function loadLivres(ObjectManager $manager, FakerGenerator $faker): void
-    // {
-    //     $livreDatas = [
-    //         [
-    //             'titre' => 'Lorem ipsum dolor sit amet',
-    //             'annee_edition' => '2010',
-    //             'nombre_pages' => '100',
-    //             'code_isbn' => '9785786930024',
-    //         ],
+    public function loadLivres(ObjectManager $manager, FakerGenerator $faker): void
+    {
+
+        $repository = $this->doctrine->getRepository(Auteur::class);
+        $auteurs = $repository->findAll();
+
+        $repository = $this->doctrine->getRepository(Genre::class);
+        $genres = $repository->findAll();
+
+        $livreDatas = [
+            [
+                'titre' => 'Lorem ipsum dolor sit amet',
+                'annee_edition' => 2010,
+                'nombre_pages' => 100,
+                'code_isbn' => '9785786930024',
+                'auteur' => $auteurs[0],
+                'genres' => [$genres[0]],
+            ],
+            [
+                'titre' => 'Consectetur adipiscing elit',
+                'annee_edition' => 2011,
+                'nombre_pages' => 150,
+                'code_isbn' => '9783817260935',
+                'auteur' => $auteurs[1],
+                'genres' => [$genres[1]],
+            ],
+            [
+                'titre' => 'Mihi quidem Antiochum',
+                'annee_edition' => 2012,
+                'nombre_pages' => 200,
+                'code_isbn' => '9782020493727',
+                'auteur' => $auteurs[2],
+                'genres' => [$genres[2]],
+            ],
+            [
+                'titre' => 'Quem audis satis belle',
+                'annee_edition' => 2013,
+                'nombre_pages' => 250,
+                'code_isbn' => '9794059561353',
+                'auteur' => $auteurs[3],
+                'genres' => [$genres[3]],
+            ],
         
 
-    //     ];
+        ];
 
-    //     foreach ($livreDatas as $livreData) {
-    //         $livre = new Livre();
-    //         $livre->setTitre($livreData['titre']);
-    //         $livre->setAnneeEdition($livreData['annee_edition']);
-    //         $livre->setNombrePages($livreData['nombre_pages']);
-    //         $livre->setCodeIsbn($livreData['code_isbn']);
+        foreach ($livreDatas as $livreData) {
+            $livre = new Livre();
+            $livre->setTitre($livreData['titre']);
+            $livre->setAnneeEdition($livreData['annee_edition']);
+            $livre->setNombrePages($livreData['nombre_pages']);
+            $livre->setCodeIsbn($livreData['code_isbn']);
+            $livre->setAuteur($livreData['auteur']);
+
+            foreach ($livreData['genres'] as $genre) {
+                $livre->addGenre($genre);
+            }
         
 
-    //         $manager->persist($livre);
-    //     }
+            $manager->persist($livre);
+        }
 
-    //     // for ($i = 0; $i < 500; $i++) {
-    //     //     $auteur = new Auteur();
-    //     //     $auteur->setNom($faker->lastName);
-    //     //     $auteur->setPrenom($faker->firstName);
+        for ($i = 0; $i < 1000; $i++) {
+            $livre = new Livre();
+            $livre->setTitre($faker->sentence($nbWords = 6, $variableNbWords = true));
+            $livre->setAnneeEdition($faker->numberBetween(1987, 2022));
+            $livre->setNombrePages($faker->numberBetween(150, 400));
+            $livre->setCodeIsbn($faker->isbn10());
+            
+            $auteur = $faker->randomElement($auteurs);
+            $livre->setAuteur($auteur);
 
-    //     //     $manager->persist($auteur);
-    //     // }
+            $genreRandoms = $faker->randomElements($genres);
 
-    //     $manager->flush();
-    // }
+            foreach ($genreRandoms as $genreRandom) {
+                $livre->addGenre($genreRandom);
+            }
+            
+            $manager->persist($livre);
+        }
+
+        $manager->flush();
+    }
 
 }
