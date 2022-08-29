@@ -73,8 +73,6 @@ class TestFixtures extends Fixture
     }
 
 
-
-//PROBLEME ENABLED CANNOT BE NULL
     public function loadUsers(ObjectManager $manager, FakerGenerator $faker): void
     {
         $userDatas = [
@@ -122,9 +120,20 @@ class TestFixtures extends Fixture
             $user->setCreatedAt($userData['created_at']);
             $user->setUpdatedAt($userData['updated_at']);
 
+            $manager->persist($user);
+        }
 
-
-
+        for ($i = 0; $i < 100; $i++) {
+            $user = new User();
+            $user->setEmail($faker->email);
+            $user->setRoles(['ROLE_EMPRUNTEUR']);
+            $user->setPassword($faker->password);
+            $user->setEnabled(true);
+            $date = $faker->dateTimeThisYear();
+            $date = DateTimeImmutable::createFromInterface($date);
+            $user->setCreatedAt($date);
+            $user->setUpdatedAt($date);
+            
 
             $manager->persist($user);
         }
