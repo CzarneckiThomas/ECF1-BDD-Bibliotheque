@@ -5,6 +5,9 @@ namespace App\DataFixtures;
 use App\Entity\Auteur;
 use App\Entity\User;
 use App\Entity\Livre;
+use App\Entity\Genre;
+use App\Entity\Emprunt;
+use App\Entity\Emprunteur;
 use DateTimeImmutable;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ManagerRegistry;
@@ -31,6 +34,8 @@ class TestFixtures extends Fixture
         $this->loadAuteurs($manager, $faker);
         $this->loadUsers($manager, $faker);
         $this->loadLivres($manager, $faker);
+        $this->loadEmprunts($manager, $faker);
+
         
     }
     
