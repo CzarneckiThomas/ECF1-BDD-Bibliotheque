@@ -131,7 +131,27 @@ class TestFixtures extends Fixture
         for ($i = 0; $i < 200; $i++) {
             $emprunt = new Emprunt();
 
-            
+            $date = $faker->dateTimeBetween('-3 month','-3 month');
+            $date = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', "2022-{$date->format('m-d H:i:s')}");
+            $emprunt->setDateEmprunt($date);
+
+            $date = $faker->optional($weight = 0.9)->dateTimeBetween('-3 month','-1 month');
+            if ($date) {
+                $date = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', "2022-{$date->format('m-d H:i:s')}");
+            }
+            $emprunt->setDateRetour($date);
+
+            $emprunteur = $faker->randomElement($emprunteurs);
+            $emprunt->setEmprunteur($emprunteur);
+
+            $count = $faker->numberBetween(1, 3);
+            $livreRandoms = $faker->randomElements($livres, $count);
+            foreach ($livreRandoms as $livreRandom) {
+                $emprunt->setLivre($livreRandom);
+            }
+
+            $manager->persist($emprunt);
+        }
 
         $manager->flush();
     }

@@ -16,7 +16,7 @@ use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 
 
-class TestFixtures extends Fixture
+class AppFixtures extends Fixture
 {
     public function __construct(ManagerRegistry $doctrine, UserPasswordHasherInterface $hasher)
     {
@@ -27,7 +27,6 @@ class TestFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
-        $faker = FakerFactory::create('fr_FR');
 
         $this->loadAuteurs($manager);
         $this->loadUsers($manager);
@@ -38,7 +37,7 @@ class TestFixtures extends Fixture
         
     }
 
-    public function loadAuteurs(ObjectManager $manager, FakerGenerator $faker): void
+    public function loadAuteurs(ObjectManager $manager): void
     {
         $auteurDatas = [
             [
@@ -74,7 +73,7 @@ class TestFixtures extends Fixture
     }
 
 
-    public function loadUsers(ObjectManager $manager, FakerGenerator $faker): void
+    public function loadUsers(ObjectManager $manager): void
     {
 
         //Compte Administreur
@@ -99,7 +98,8 @@ class TestFixtures extends Fixture
                 'email' => 'foo.foo@example.com',
                 'roles' => ['ROLE_EMRUNTEUR'],
                 'password' => '$2y$10$/H2ChUxriH.0Q33g3EUEx.S2s4j/rGJH2G88jK9nCP60GbUW8mi5K',
-                'enabled' => 'true',
+                'enabled' => true,
+                'actif' => true,
                 'created_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-01-01 10:00:00'),
                 'updated_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-01-01 10:00:00'),
             ],
@@ -110,7 +110,8 @@ class TestFixtures extends Fixture
                 'email' => 'bar.bar@example.com',
                 'roles' => ['ROLE_EMRUNTEUR'],
                 'password' => '$2y$10$/H2ChUxriH.0Q33g3EUEx.S2s4j/rGJH2G88jK9nCP60GbUW8mi5K',
-                'enabled' => 'false',
+                'enabled' => false,
+                'actif' => false,
                 'created_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-01-01 11:00:00'),
                 'updated_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-01-01 11:00:00'),
             ],
@@ -121,7 +122,8 @@ class TestFixtures extends Fixture
                 'email' => 'baz.baz@example.com',
                 'roles' => ['ROLE_EMRUNTEUR'],
                 'password' => '$2y$10$/H2ChUxriH.0Q33g3EUEx.S2s4j/rGJH2G88jK9nCP60GbUW8mi5K',
-                'enabled' => 'true',
+                'enabled' => true,
+                'actif' => true,
                 'created_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-01-01 12:00:00'),
                 'updated_at' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-01-01 12:00:00'),
             ],
@@ -146,8 +148,8 @@ class TestFixtures extends Fixture
             $emprunteur->setPrenom($emprunteurData['prenom']);
             $emprunteur->setTel($emprunteurData['tel']);
             $emprunteur->setActif($emprunteurData['actif']);
-            $emprunteur->setCreatedAt($emprunteurData['createdAt']);
-            $emprunteur->setUpdatedAt($emprunteurData['updatedAt']);
+            $emprunteur->setCreatedAt($emprunteurData['created_at']);
+            $emprunteur->setUpdatedAt($emprunteurData['updated_at']);
 
             $manager->persist($emprunteur);
         }
@@ -158,7 +160,76 @@ class TestFixtures extends Fixture
     }
 
 
-    public function loadLivres(ObjectManager $manager, FakerGenerator $faker): void
+    public function loadGenres(ObjectManager $manager): void
+    {
+        $genreDatas = [
+            [
+                'nom' => 'poésie',
+                'description' => null,
+            ],
+            [
+                'nom' => 'nouvelle',
+                'description' => null,
+            ],
+            [
+                'nom' => 'roman historique',
+                'description' => null,
+            ],
+            [
+                'nom' => 'roman d\'amour',
+                'description' => null,
+            ],
+            [
+                'nom' => 'roman d\'aventure',
+                'description' => null,
+            ],
+            [
+                'nom' => 'science-fiction',
+                'description' => null,
+            ],
+            [
+                'nom' => 'fantasy',
+                'description' => null,
+            ],
+            [
+                'nom' => 'biographie',
+                'description' => null,
+            ],
+            [
+                'nom' => 'conte',
+                'description' => null,
+            ],
+            [
+                'nom' => 'témoignage',
+                'description' => null,
+            ],
+            [
+                'nom' => 'théâtre',
+                'description' => null,
+            ],
+            [
+                'nom' => 'essai',
+                'description' => null,
+            ],
+            [
+                'nom' => 'journal intime',
+                'description' => null,
+            ],
+        ];
+
+        foreach ($genreDatas as $genreData) {
+            $genre = new Genre();
+            $genre->setNom($genreData['nom']);
+            $genre->setDescription($genreData['description']);
+
+            $manager->persist($genre);
+        }
+
+        $manager->flush();
+    }
+
+    
+    public function loadLivres(ObjectManager $manager): void
     {
 
         $repository = $this->doctrine->getRepository(Auteur::class);
@@ -223,4 +294,52 @@ class TestFixtures extends Fixture
         $manager->flush();
     }
 
+    
+    public function loadEmprunts(ObjectManager $manager): void
+    {
+        $repository = $this->doctrine->getRepository(Livre::class);
+        $livres = $repository->findAll();
+
+        $repository = $this->doctrine->getRepository(Emprunteur::class);
+        $emprunteurs = $repository->findAll();
+
+        $empruntDatas = [
+            [
+                'date_emprunt' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-02-01 10:00:00'),
+                'date_retour' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-03-01 10:00:00'),
+                'emprunteur' => $emprunteurs[0],
+                'livres' => [$livres[0]],
+            ],
+            [
+                'date_emprunt' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-03-01 10:00:00'),
+                'date_retour' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-04-01 10:00:00'),
+                'emprunteur' => $emprunteurs[1],
+                'livres' => [$livres[1]],
+            ],
+            [
+                'date_emprunt' => DateTimeImmutable::createFromFormat('Y-m-d H:i:s', '2020-04-01 10:00:00'),
+                'date_retour' => null,
+                'emprunteur' => $emprunteurs[2],
+                'livres' => [$livres[2]],
+            ],
+        ];
+
+        foreach ($empruntDatas as $empruntData) {
+            $emprunt = new Emprunt();
+            $emprunt->setDateEmprunt($empruntData['date_emprunt']);
+            $emprunt->setDateRetour($empruntData['date_retour']);
+            $emprunt->setEmprunteur($empruntData['emprunteur']);
+            
+            foreach ($empruntData['livres'] as $livre) {
+                $emprunt->setLivre($livre);
+            }
+
+            $manager->persist($emprunt);
+        }
+
+        $manager->flush();
+    }
+
+
+    
 }
