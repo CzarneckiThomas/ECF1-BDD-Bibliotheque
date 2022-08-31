@@ -2,10 +2,10 @@
 
 namespace App\DataFixtures;
 
+use App\Entity\Genre;
 use App\Entity\Auteur;
 use App\Entity\User;
 use App\Entity\Livre;
-use App\Entity\Genre;
 use App\Entity\Emprunt;
 use App\Entity\Emprunteur;
 use DateTimeImmutable;
@@ -131,7 +131,7 @@ class TestFixtures extends Fixture
         for ($i = 0; $i < 200; $i++) {
             $emprunt = new Emprunt();
 
-            $date = $faker->dateTimeBetween('-3 month','-3 month');
+            $date = $faker->dateTimeBetween('-6 month','-3 month');
             $date = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', "2022-{$date->format('m-d H:i:s')}");
             $emprunt->setDateEmprunt($date);
 
@@ -144,11 +144,8 @@ class TestFixtures extends Fixture
             $emprunteur = $faker->randomElement($emprunteurs);
             $emprunt->setEmprunteur($emprunteur);
 
-            $count = $faker->numberBetween(1, 3);
-            $livreRandoms = $faker->randomElements($livres, $count);
-            foreach ($livreRandoms as $livreRandom) {
-                $emprunt->setLivre($livreRandom);
-            }
+            $livre = $faker->randomElement($livres);
+            $emprunt->setLivre($livre);
 
             $manager->persist($emprunt);
         }

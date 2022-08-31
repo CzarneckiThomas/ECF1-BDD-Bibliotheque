@@ -30,8 +30,8 @@ class AppFixtures extends Fixture
 
         $this->loadAuteurs($manager);
         $this->loadUsers($manager);
-        $this->loadLivres($manager);
         $this->loadGenres($manager);
+        $this->loadLivres($manager);
         $this->loadEmprunts($manager);
 
         
