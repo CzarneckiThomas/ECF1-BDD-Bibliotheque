@@ -2,61 +2,65 @@
 
 namespace App\Controller;
 
+
 use App\Entity\Auteur;
 use App\Entity\Emprunt;
 use App\Entity\Emprunteur;
 use App\Entity\Genre;
 use App\Entity\Livre;
 use App\Entity\User;
+use App\Repository\AuteurRepository;
+use App\Repository\EmpruntRepository;
+use App\Repository\EmprunteurRepository;
+use App\Repository\GenreRepository;
+use App\Repository\LivreRepository;
+use App\Repository\UserRepository;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DbTestController extends AbstractController
-{
-    #[Route('/db/test', name: 'app_db_test')]
-    public function index(): Response
+{ 
+    #[Route('/db/test/users', name: 'app_db_test_users')]
+    public function users(ManagerRegistry $doctrine): Response
     {
-        // récupération du repository des auteurs
-        $repository = $doctrine->getRepository(Auteur::class);
-        // récupération de la liste complète de toutes les aurteurs
-        $auteurs = $repository->findAll();
-        // inspection de la liste
-        dump($auteurs);
+// - Affiche la liste complète de tous les utilisateurs de la table `user`
+        $repository = $doctrine->getRepository(User::class);
+        $users = $repository->findAll();
+        dump($users);
 
-        // récupération du repository des emprunts
-        $repository = $doctrine->getRepository(Emprunt::class);
-        // récupération de la liste complète de toutes les emprunts
-        $emprunts = $repository->findAll();
-        // inspection de la liste
-        dump($emprunts);
+// - Affihe les données de l'utilisateur dont l'id est `1`
+        $users = $repository->find(1);
+        dump($users);
 
-        // récupération du repository des emprunteurs
-        $repository = $doctrine->getRepository(Emprunteur::class);
-        // récupération de la liste complète de toutes les emprunteurs
-        $emprunteurs = $repository->findAll();
-        // inspection de la liste
-        dump($emprunteurs);
+// - Affiche les données de l'utilisateur dont l'email est `foo.foo@example.com`
+        $users = $repository->findByEmail('foo.foo@example.com');
+        dump($users);
 
-        // récupération du repository des genres
-        $repository = $doctrine->getRepository(Genre::class);
-        // récupération de la liste complète de toutes les genres
-        $genres = $repository->findAll();
-        // inspection de la liste
-        dump($genres);
+// - Affiche les données des utilisateurs dont l'attribut `roles` 
+//   contient le mot clé `ROLE_EMRUNTEUR`
+        $users = $repository->findByRoles(['ROLE_EMPRUNTEUR']);
+        dump($users);
 
-        // récupération du repository des livres
+        exit();
+    }
+
+
+    #[Route('/db/test/livres', name: 'app_db_test_livres')]
+    public function livres(ManagerRegistry $doctrine): Response
+    {
+//- la liste complète de tous les livres
         $repository = $doctrine->getRepository(Livre::class);
-        // récupération de la liste complète de toutes les livres
         $livres = $repository->findAll();
-        // inspection de la liste
         dump($livres);
 
-        // récupération du repository des users
-        $repository = $doctrine->getRepository(User::class);
-        // récupération de la liste complète de toutes les users
-        $users = $repository->findAll();
-        // inspection de la liste
-        dump($users);
+ // - les données du livre dont l'id est `1`
+        $livres = $repository->find(1);
+        dump($livres);
+
+
+        exit();
     }
 }
+
