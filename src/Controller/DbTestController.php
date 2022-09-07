@@ -30,7 +30,7 @@ class DbTestController extends AbstractController
         $users = $repository->findAll();
         dump($users);
 
-// - Affihe les données de l'utilisateur dont l'id est `1`
+// - Affiche les données de l'utilisateur dont l'id est `1`
         $users = $repository->find(1);
         dump($users);
 
@@ -50,8 +50,10 @@ class DbTestController extends AbstractController
     #[Route('/db/test/livres', name: 'app_db_test_livres')]
     public function livres(ManagerRegistry $doctrine): Response
     {
-//- la liste complète de tous les livres
         $repository = $doctrine->getRepository(Livre::class);
+
+//- la liste complète de tous les livres
+        
         $livres = $repository->findAll();
         dump($livres);
 
@@ -59,7 +61,26 @@ class DbTestController extends AbstractController
         $livres = $repository->find(1);
         dump($livres);
 
+//- la liste des livres dont le titre contient le mot clé `lorem`
+        $livres = $repository->findByKeyword('titre');
+        dump($livres);
 
+//- la liste des livres dont l'id de l'auteur est `2`
+        $id = 2;
+        $livres = $repository->find($id);
+        dump($livres);
+
+//- la liste des livres dont le genre contient le mot clé `roman`
+
+        
+// //- ajouter un nouveau livre
+//         $livre = new Livre();
+//         $livre->setTitre('Totum autem id externum');
+//             $livre->setAnneeEdition(2020);
+//             $livre->setNombrePages(300);
+//             $livre->setCodeIsbn(9790412882714);
+//             $livre->setAuteur();
+//         dump($tag);
         exit();
     }
 }
