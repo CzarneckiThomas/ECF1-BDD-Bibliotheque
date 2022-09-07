@@ -40,7 +40,7 @@ class DbTestController extends AbstractController
 
 // - Affiche les données des utilisateurs dont l'attribut `roles` 
 //   contient le mot clé `ROLE_EMRUNTEUR`
-        $users = $repository->findByRoles(['ROLE_EMPRUNTEUR']);
+        $users = $repository->findByRole('ROLE_EMPRUNTEUR');
         dump($users);
 
         exit();
@@ -62,15 +62,16 @@ class DbTestController extends AbstractController
         dump($livres);
 
 //- la liste des livres dont le titre contient le mot clé `lorem`
-        $livres = $repository->findByKeyword('titre');
+        $livres = $repository->findByKeyword('lorem');
         dump($livres);
 
-//- la liste des livres dont l'id de l'auteur est `2`
+// //- la liste des livres dont l'id de l'auteur est `2`
         $id = 2;
         $livres = $repository->find($id);
         dump($livres);
 
-//- la liste des livres dont le genre contient le mot clé `roman`
+// //- la liste des livres dont le genre contient le mot clé `roman`
+        
 
         
 // //- ajouter un nouveau livre
@@ -84,4 +85,5 @@ class DbTestController extends AbstractController
         exit();
     }
 }
+
 
