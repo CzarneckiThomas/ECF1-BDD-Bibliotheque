@@ -71,17 +71,19 @@ class DbTestController extends AbstractController
         dump($livres);
 
 // //- la liste des livres dont le genre contient le mot clé `roman`
-        
 
-        
-// //- ajouter un nouveau livre
-//         $livre = new Livre();
-//         $livre->setTitre('Totum autem id externum');
-//             $livre->setAnneeEdition(2020);
-//             $livre->setNombrePages(300);
-//             $livre->setCodeIsbn(9790412882714);
-//             $livre->setAuteur();
-//         dump($tag);
+$livres = $repository->findByKeywordGenre('roman');
+
+        foreach ($livres as $livre) {
+            dump($livre);
+
+            $genres = $livre->getGenres();
+
+            foreach ($genres as $genre) {
+                dump($genre);
+            }
+        }
+
         exit();
     }
 }

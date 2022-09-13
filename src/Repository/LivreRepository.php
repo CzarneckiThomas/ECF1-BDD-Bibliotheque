@@ -53,6 +53,17 @@ class LivreRepository extends ServiceEntityRepository
        ;
    }
 
+   public function findByKeywordGenre($keyword): array
+    {
+        return $this->createQueryBuilder('l')
+            ->innerJoin('l.genres', 'g')
+            ->andWhere('g.nom LIKE :keyword')
+            ->setParameter('keyword', "%{$keyword}%")
+            ->orderBy('l.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
 //    /**
 //     * @return Livre[] Returns an array of Livre objects
